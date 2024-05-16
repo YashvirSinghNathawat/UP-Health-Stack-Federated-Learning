@@ -47,9 +47,9 @@ def receive_parameters_and_run_model():
     request_data = request.json
     parameters = request_data['parameters']
     client.round_num = request_data['round_num']
-    #print(f"Client {client_id}: Parameters = ",parameters)
+    print("Received Parameters from Server : ",parameters)
     new_parameters = client.update_model_with_parameters(parameters)
-    print("New Parameters = ",new_parameters)
+    print("Trained Parameters : ",new_parameters)
     return jsonify({"message": f"Model updated and trained for Client {client.client_id}.",
                 "parameters": new_parameters,
                 "client_id" : client_id})

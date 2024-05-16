@@ -59,8 +59,9 @@ async def send_request(session, url, data, client_id,server):
 
 
 
-async def send_updated_parameters_to_clients(server):
-    updated_parameters = {"parameters" : server.globals_parameters,"round_num":server.curr_round}
+async def send_updated_parameters_to_clients(server,client_iter):
+    updated_parameters = {"parameters" : server.globals_parameters,"round_num":server.curr_round,
+                        "client_iter" : client_iter}
     async with aiohttp.ClientSession() as session:
         tasks = []
         for client_id in range(1, num_clients + 1):
@@ -80,12 +81,14 @@ if __name__ == '__main__':
     m_size = 22
     c_size = 1
     num_clients = 2  # Assuming there are 5 clients
+    max_round = 3
+    client_iter = 2
+
 
     # Initialize the global parameters dictionary
     global_parameters = {"m": [0 for i in range(m_size)], "c": [0 for i in range(c_size)]}
 
 
-    max_round = 3
     server = Server(global_parameters,max_round)
 
     start_learning = input("Press 'Y' to start Federated Learning: ")
@@ -95,7 +98,7 @@ if __name__ == '__main__':
             print(f"Round {i}")
             print("-"*50)
             loop = asyncio.get_event_loop()
-            responses = loop.run_until_complete(send_updated_parameters_to_clients(server))
+            responses = loop.run_until_complete(send_updated_parameters_to_clients(server,client_iter))
 
             print("\nClient Parameters : ",server.client_parameters,'\n')
 

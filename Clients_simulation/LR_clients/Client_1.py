@@ -19,7 +19,7 @@ class Client:
         self.client_id = client_id
         self.data_train, self.data_test, self.target_train, self.target_test = train_test_split(
             data, target, test_size=0.2, random_state=client_id)
-        self.model = LinearRegression(n_iters=1)  # Placeholder hyperparameters
+        self.model = LinearRegression()  # Placeholder hyperparameters
         self.accuracy = None
         self.round_num = None
 
@@ -30,8 +30,8 @@ class Client:
     def calculate_accuracy(self):
         # Evaluate accuracy on local data
         predictions = self.model.predict(self.data_test)
-        print("Predictions : ",predictions.shape)
-        self.accuracy = np.mean(predictions == self.target_test)
+        true_target = self.target_test.to_numpy()
+        self.accuracy = np.mean(predictions == true_target)
         print(f"Accuracy for round {self.round_num}: {self.accuracy}")
 
     def update_model_with_parameters(self, parameters):
@@ -47,6 +47,15 @@ def receive_parameters_and_run_model():
     request_data = request.json
     parameters = request_data['parameters']
     client.round_num = request_data['round_num']
+    client_iter = request_data['client_iter']
+
+    client.model.change_n_iters(client_iter)
+
+    print('-'*50)
+    print(f'Round {client.round_num}')
+    print('-'*50)
+
+
     print("Received Parameters from Server : ",parameters)
     new_parameters = client.update_model_with_parameters(parameters)
     print("Trained Parameters : ",new_parameters)
@@ -59,9 +68,9 @@ if __name__ == "__main__":
         hyperparameters for clients model are defined in the client class, where the model is initialized for each client.
     """
 
-    file_path = "client_data\client_1_data.csv"  # Adjust file path as needed
+    file_path = f"client_data\client_{client_id}_data.csv"  # Adjust file path as needed
     data = pd.read_csv(file_path)
-    X = data.drop(columns=['id', 'price','host_id'])
+    X = data.drop(columns=[ 'price'])
     y = data['price']
     client = Client(client_id, X, y)
 

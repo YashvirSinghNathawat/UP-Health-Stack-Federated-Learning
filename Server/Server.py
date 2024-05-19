@@ -4,8 +4,6 @@ import aiohttp
 import asyncio
 
 
-
-
 class Server:
     def __init__(self,globals_parameters, max_round):
         self.globals_parameters = globals_parameters
@@ -59,9 +57,9 @@ async def send_request(session, url, data, client_id,server):
 
 
 
-async def send_updated_parameters_to_clients(server,client_iter):
+async def send_updated_parameters_to_clients(server,client_iter,client_learning_rate):
     updated_parameters = {"parameters" : server.globals_parameters,"round_num":server.curr_round,
-                        "client_iter" : client_iter}
+                        "client_iter" : client_iter,"client_learning_rate" : client_learning_rate}
     async with aiohttp.ClientSession() as session:
         tasks = []
         for client_id in range(1, num_clients + 1):
@@ -78,11 +76,12 @@ if __name__ == '__main__':
     
     
     # Define the size of arrays
-    m_size = 22
+    m_size = 10
     c_size = 1
     num_clients = 2  # Assuming there are 5 clients
-    max_round = 3
-    client_iter = 2
+    max_round = 20
+    client_iter = 10000
+    client_learning_rate = 0.1
 
 
     # Initialize the global parameters dictionary
@@ -98,7 +97,7 @@ if __name__ == '__main__':
             print(f"Round {i}")
             print("-"*50)
             loop = asyncio.get_event_loop()
-            responses = loop.run_until_complete(send_updated_parameters_to_clients(server,client_iter))
+            responses = loop.run_until_complete(send_updated_parameters_to_clients(server,client_iter,client_learning_rate))
 
             print("\nClient Parameters : ",server.client_parameters,'\n')
 

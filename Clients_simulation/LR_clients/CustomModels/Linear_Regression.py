@@ -15,11 +15,6 @@ class LinearRegression:
 
         # Get the number of samples
         num_samples = float(len(X_train))
-
-        from sklearn.preprocessing import StandardScaler
-
-        scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
         
         # Gradient Descent
         for i in range(self.n_iters):
@@ -34,7 +29,6 @@ class LinearRegression:
             D_m = (-2 / num_samples) * np.dot(X_train.T, residuals)
             D_c = (-2 / num_samples) * np.sum(residuals)
             
-            print("Check kar L ",D_m,D_c)
             self.m = self.m - self.lr * D_m
             self.c = self.c - self.lr * D_c
 
@@ -51,5 +45,6 @@ class LinearRegression:
         local_parameter = {'m' : self.m.tolist() , 'c' : self.c.tolist()}
         return local_parameter
     
-    def change_n_iters(self,client_iter):
+    def change_model_parameters(self,client_iter,client_learning_rate):
         self.n_iters = client_iter
+        self.client_learning_rate = client_learning_rate
